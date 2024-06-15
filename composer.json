@@ -9,10 +9,6 @@
       "email": "your-email@example.com"
     }
   ],
-  "require": {
-    "php": "^7.4|^8.0",
-    "laravel/framework": "^8.0|^9.0"
-  },
   "autoload": {
     "psr-4": {
       "Rakshitbharat\\LaravelStorageWithDatabase\\": "src/"
