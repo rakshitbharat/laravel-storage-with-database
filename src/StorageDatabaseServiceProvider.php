@@ -8,6 +8,10 @@ class StorageDatabaseServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/storage-database.php', 'storage-database'
+        );
+
         $this->app->singleton('storage-database', function ($app) {
             return new StorageDatabaseManager($app);
         });
@@ -15,11 +19,11 @@ class StorageDatabaseServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->publishes([
-            __DIR__ . '/../config/storage-database.php' => config_path('storage-database.php'),
-        ], 'config');
-
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/config/storage-database.php' => config_path('storage-database.php'),
+            ], 'config');
+
             $this->publishes([
                 $this->getMigrationFilePath() => $this->getMigrationOutputPath(),
             ], 'migrations');
