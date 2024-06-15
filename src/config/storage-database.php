@@ -7,7 +7,7 @@ return [
         'database' => [
             'driver' => 'database',
             'table' => 'storage',
-            'connection' => 'mysql',
+            'connection' => env('DB_CONNECTION', 'mysql'),
         ],
     ],
 ];
