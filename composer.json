@@ -1,0 +1,33 @@
+{
+  "name": "rakshitbharat/laravel-storage-with-database",
+  "description": "A Laravel package for storing and retrieving text-based data using a database.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Rakshit Bharat",
+      "email": "your-email@example.com"
+    }
+  ],
+  "require": {
+    "php": "^7.4|^8.0",
+    "laravel/framework": "^8.0|^9.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Rakshitbharat\\LaravelStorageWithDatabase\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Rakshitbharat\\LaravelStorageWithDatabase\\StorageDatabaseServiceProvider"
+      ],
+      "aliases": {
+        "StorageDatabase": "Rakshitbharat\\LaravelStorageWithDatabase\\Facades\\StorageDatabase"
+      }
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
