@@ -32,7 +32,7 @@ class StorageDatabaseServiceProvider extends ServiceProvider
 
     protected function getMigrationFilePath()
     {
-        return __DIR__ . '/../database/migrations/create_storage_table.php.stub';
+        return __DIR__ . '/database/migrations/create_storage_table.php.stub';
     }
 
     protected function getMigrationOutputPath()
