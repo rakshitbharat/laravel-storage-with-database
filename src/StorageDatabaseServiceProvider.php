@@ -21,23 +21,18 @@ class StorageDatabaseServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/storage-database.php' => config_path('storage-database.php'),
-            ], 'config');
-
-            $this->publishes([
-                $this->getMigrationFileName() => database_path('migrations/' . date('Y_m_d_His', time()) . '_create_storage_table.php'),
+                $this->getMigrationFilePath() => $this->getMigrationOutputPath(),
             ], 'migrations');
         }
     }
 
-    protected function getMigrationFileName()
+    protected function getMigrationFilePath()
     {
-        $stubPath = __DIR__ . '/../database/migrations/create_storage_table.php.stub';
-        $migrationContent = file_get_contents($stubPath);
+        return __DIR__ . '/../database/migrations/create_storage_table.php.stub';
+    }
 
-        $tableName = $this->app['config']['storage-database.disks.database.table'];
-        $migrationContent = str_replace('{{ table }}', $tableName, $migrationContent);
-
-        return $migrationContent;
+    protected function getMigrationOutputPath()
+    {
+        return database_path('migrations/' . date('Y_m_d_His') . '_create_storage_table.php');
     }
 }
