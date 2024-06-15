@@ -2,6 +2,7 @@
 
 namespace Rakshitbharat\LaravelStorageWithDatabase;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseDriver
@@ -10,103 +11,88 @@ class DatabaseDriver
 
     public function __construct($config)
     {
-        $this->config = $config;
+        $this->config = $config['disks']['database'];
     }
 
-    public function exists($key)
+    public function exists($path)
     {
         return DB::connection($this->config['connection'])->table($this->config['table'])
-            ->where('key', $key)
+            ->where('path', $path)
             ->exists();
     }
 
-    public function get($key)
+    public function get($path)
     {
-        return DB::connection($this->config['connection'])->table($this->config['table'])
-            ->where('key', $key)
-            ->value('value');
+        $entry = DB::connection($this->config['connection'])->table($this->config['table'])
+            ->where('path', $path)
+            ->first();
+
+        if (!$entry) {
+            throw new FileNotFoundException($path);
+        }
+
+        return $entry->contents;
     }
 
-    public function getVisibility($key)
-    {
-        return 'public';
-    }
-
-    public function put($key, $value, $options = [])
+    public function put($path, $contents, $options = [])
     {
         DB::connection($this->config['connection'])->table($this->config['table'])->updateOrInsert(
-            ['key' => $key],
-            ['value' => $value]
+            ['path' => $path],
+            ['contents' => $contents]
         );
     }
 
-    public function prepend($key, $value)
+    public function prepend($path, $contents)
     {
-        $existingValue = $this->get($key);
-        $newValue = $value . $existingValue;
-        $this->put($key, $newValue);
+        $existingContents = $this->get($path);
+        $newContents = $contents . $existingContents;
+        $this->put($path, $newContents);
     }
 
-    public function append($key, $value)
+    public function append($path, $contents)
     {
-        $existingValue = $this->get($key);
-        $newValue = $existingValue . $value;
-        $this->put($key, $newValue);
+        $existingContents = $this->get($path);
+        $newContents = $existingContents . $contents;
+        $this->put($path, $newContents);
     }
 
-    public function delete($key)
+    public function delete($path)
     {
         DB::connection($this->config['connection'])->table($this->config['table'])
-            ->where('key', $key)
+            ->where('path', $path)
             ->delete();
     }
 
     public function copy($from, $to)
     {
-        $value = $this->get($from);
-        $this->put($to, $value);
+        $contents = $this->get($from);
+        $this->put($to, $contents);
     }
 
     public function move($from, $to)
     {
-        $value = $this->get($from);
-        $this->put($to, $value);
+        $contents = $this->get($from);
+        $this->put($to, $contents);
         $this->delete($from);
     }
 
-    public function size($key)
+    public function size($path)
     {
-        return strlen($this->get($key));
+        $contents = $this->get($path);
+        return strlen($contents);
     }
 
-    public function lastModified($key)
+    public function lastModified($path)
     {
-        return time();
-    }
+        $entry = DB::connection($this->config['connection'])->table($this->config['table'])
+            ->where('path', $path)
+            ->first();
 
-    public function url($key)
-    {
-        return null;
-    }
+        if (!$entry) {
+            throw new FileNotFoundException($path);
+        }
 
-    public function temporaryUrl($key, $expiration, $options = [])
-    {
-        return null;
-    }
-
-    public function getVisibility($key)
-    {
-        return 'public';
-    }
-
-    public function setVisibility($key, $visibility)
-    {
-        // Do nothing since visibility is not supported
-    }
-
-    public function deleteDirectory($directory)
-    {
-        // Do nothing since directories are not supported
+        return $entry->updated_at->timestamp;
     }
 
     public function files($directory)
@@ -129,7 +115,12 @@ class DatabaseDriver
         return [];
     }
 
-    public function makeDirectory($directory)
+    public function makeDirectory($path)
+    {
+        // Do nothing since directories are not supported
+    }
+
+    public function deleteDirectory($directory)
     {
         // Do nothing since directories are not supported
     }

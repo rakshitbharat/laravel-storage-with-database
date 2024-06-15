@@ -7,7 +7,7 @@ return [
         'database' => [
             'driver' => 'database',
             'table' => 'storage',
-            'connection' => null,
+            'connection' => 'mysql',
         ],
     ],
 ];
