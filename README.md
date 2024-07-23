@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/rakshitbharat/laravel-storage-with-database.svg?style=flat-square)](https://packagist.org/packages/rakshitbharat/laravel-storage-with-database)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
-Laravel Storage with Database is a powerful package that provides a seamless way to store and retrieve text-based data using a database in Laravel. It offers a simple and intuitive API similar to Laravel's built-in Storage facade, making it easy to switch from file-based storage to database storage for your text-based data.
+Laravel Storage with Database is a powerful package that provides a seamless way to store and retrieve text-based data using a database in Laravel. It offers a simple and intuitive API similar to Laravel's built-in Storage facade, making it easy to switch from file-based storage to database storage for your text-based data[1].
 
 ## Features
 
@@ -38,18 +38,31 @@ Next, run the database migration to create the necessary table:
 php artisan migrate
 ```
 
+## Configuration
+
+To use the database storage driver, you need to update your `config/filesystems.php` file. Add the following to the `disks` array:
+
+```php
+'disks' => [
+    // ... other disks ...
+    'database' => [
+        'driver' => 'database'
+    ],
+],
+```
+
 ## Usage
 
-Once the package is installed and configured, you can start using it to store and retrieve text-based data. The package provides a `StorageDatabase` facade that you can use to interact with the stored data.
+Once the package is installed and configured, you can start using it to store and retrieve text-based data. You can use the `Storage` facade with the `database` disk to interact with the stored data.
 
 ### Storing Data
 
 To store data, you can use the `put` method:
 
 ```php
-use Rakshitbharat\LaravelStorageWithDatabase\Facades\StorageDatabase;
+use Illuminate\Support\Facades\Storage;
 
-StorageDatabase::put('key', 'value');
+Storage::disk('database')->put('key', 'value');
 ```
 
 ### Retrieving Data
@@ -57,9 +70,9 @@ StorageDatabase::put('key', 'value');
 To retrieve data, you can use the `get` method:
 
 ```php
-use Rakshitbharat\LaravelStorageWithDatabase\Facades\StorageDatabase;
+use Illuminate\Support\Facades\Storage;
 
-$value = StorageDatabase::get('key');
+$value = Storage::disk('database')->get('key');
 ```
 
 ### Checking Data Existence
@@ -67,9 +80,9 @@ $value = StorageDatabase::get('key');
 To check if a key exists, you can use the `exists` method:
 
 ```php
-use Rakshitbharat\LaravelStorageWithDatabase\Facades\StorageDatabase;
+use Illuminate\Support\Facades\Storage;
 
-$exists = StorageDatabase::exists('key');
+$exists = Storage::disk('database')->exists('key');
 ```
 
 ### Deleting Data
@@ -77,22 +90,14 @@ $exists = StorageDatabase::exists('key');
 To delete data, you can use the `delete` method:
 
 ```php
-use Rakshitbharat\LaravelStorageWithDatabase\Facades\StorageDatabase;
+use Illuminate\Support\Facades\Storage;
 
-StorageDatabase::delete('key');
+Storage::disk('database')->delete('key');
 ```
 
 ### Other Methods
 
-The package provides several other methods for interacting with the stored data, such as `append`, `prepend`, `copy`, `move`, `size`, `lastModified`, and more. Please refer to the documentation for a complete list of available methods.
-
-## Configuration
-
-The package comes with a configuration file `storage-database.php` that allows you to customize various settings. You can modify the database connection, table name, and column names to suit your requirements.
-
-## Documentation
-
-For detailed documentation and code examples, please refer to the [official documentation](https://github.com/rakshitbharat/laravel-storage-with-database/wiki).
+The package supports other Laravel Storage methods like `append`, `prepend`, `copy`, `move`, `size`, `lastModified`, and more. Refer to the Laravel filesystem documentation for a complete list of available methods[1].
 
 ## Contributing
 
@@ -100,4 +105,4 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 
 ## License
 
-Laravel Storage with Database is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Laravel Storage with Database is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT)[1].
