@@ -4,6 +4,7 @@ namespace Rakshitbharat\LaravelStorageWithDatabase;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Filesystem\FilesystemManager;
+use Rakshitbharat\LaravelStorageWithDatabase\Console\StorageMonitorCommand;
 
 class StorageDatabaseServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,7 @@ class StorageDatabaseServiceProvider extends ServiceProvider
     {
         $this->registerPublishing();
         $this->registerMigrations();
+        $this->registerCommands();
     }
 
     /**
@@ -61,6 +63,18 @@ class StorageDatabaseServiceProvider extends ServiceProvider
 
         if ($this->shouldRunMigrations()) {
             $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        }
+    }
+
+    /**
+     * Register the package's commands.
+     */
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                StorageMonitorCommand::class,
+            ]);
         }
     }
 

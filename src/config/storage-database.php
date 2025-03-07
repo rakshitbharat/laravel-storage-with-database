@@ -3,59 +3,30 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Default Database Storage Driver
+    | Default Storage Driver
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the default database storage driver that should be
-    | used by the framework. The "database" driver is the only supported
-    | driver currently.
+    | Here you can specify the default storage driver that will be used
+    | by your application. Currently, only 'database' is supported.
     |
     */
-    'default' => env('STORAGE_DATABASE_DRIVER', 'database'),
+    'default' => 'database',
 
     /*
     |--------------------------------------------------------------------------
-    | Database Storage Disks
+    | Database Disk Configuration
     |--------------------------------------------------------------------------
     |
-    | Here you may configure as many database storage "disks" as you wish.
-    | You can even configure multiple disks of the same driver.
+    | Configure the database connection and table name for storing files.
     |
     */
     'disks' => [
         'database' => [
             'driver' => 'database',
-            'table' => env('STORAGE_DATABASE_TABLE', 'storage'),
-            'connection' => env('STORAGE_DATABASE_CONNECTION', env('DB_CONNECTION', 'mysql')),
-            'max_content_size' => env('STORAGE_DATABASE_MAX_SIZE', 10485760), // 10MB
+            'table' => 'storage',
+            'connection' => null, // Uses default connection if null
+            'max_content_size' => 10485760, // 10MB default max content size
         ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Auto-run Migrations
-    |--------------------------------------------------------------------------
-    |
-    | This option controls whether package migrations should be auto-run when
-    | the package is installed or updated. Set this to false if you would
-    | like to run migrations manually.
-    |
-    */
-    'run_migrations' => env('STORAGE_DATABASE_RUN_MIGRATIONS', false),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Security Options
-    |--------------------------------------------------------------------------
-    |
-    | Configure security-related options. These help protect against unwanted
-    | data storage and access.
-    |
-    */
-    'security' => [
-        'allowed_mime_types' => explode(',', env('STORAGE_DATABASE_ALLOWED_MIMES', 'text/plain,text/html,application/json')),
-        'validate_content' => env('STORAGE_DATABASE_VALIDATE_CONTENT', true),
-        'max_key_length' => env('STORAGE_DATABASE_MAX_KEY_LENGTH', 255),
     ],
 
     /*
@@ -63,26 +34,103 @@ return [
     | Cache Configuration
     |--------------------------------------------------------------------------
     |
-    | Configure caching options for improved performance. Set to false to
-    | disable caching.
+    | Configure caching behavior for improved performance. Caching can
+    | significantly improve read performance for frequently accessed files.
     |
     */
     'cache' => [
-        'enabled' => env('STORAGE_DATABASE_CACHE_ENABLED', false),
-        'ttl' => env('STORAGE_DATABASE_CACHE_TTL', 3600), // 1 hour
+        'enabled' => env('STORAGE_DATABASE_CACHE_ENABLED', true),
         'store' => env('STORAGE_DATABASE_CACHE_STORE', 'file'),
+        'ttl' => env('STORAGE_DATABASE_CACHE_TTL', 3600),
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Logging Options
+    | Security Configuration
     |--------------------------------------------------------------------------
     |
-    | Configure logging options for the storage operations.
+    | Configure security constraints for file storage. These settings help
+    | prevent unwanted content types and oversized files.
+    |
+    */
+    'security' => [
+        'validate_content' => env('STORAGE_DATABASE_VALIDATE_CONTENT', true),
+        'allowed_mime_types' => [
+            'text/plain',
+            'text/html',
+            'text/css',
+            'text/javascript',
+            'application/json',
+            'application/xml',
+        ],
+        'max_key_length' => 255,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logging Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure monitoring and logging behavior. This helps track storage
+    | operations and diagnose issues.
     |
     */
     'logging' => [
         'enabled' => env('STORAGE_DATABASE_LOGGING_ENABLED', false),
-        'channel' => env('STORAGE_DATABASE_LOG_CHANNEL', env('LOG_CHANNEL', 'stack')),
+        'channel' => env('STORAGE_DATABASE_LOG_CHANNEL', 'stack'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database Migration Settings
+    |--------------------------------------------------------------------------
+    |
+    | Control whether migrations should be run automatically when the
+    | package is installed or upgraded.
+    |
+    */
+    'run_migrations' => env('STORAGE_DATABASE_RUN_MIGRATIONS', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Batch Operation Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure behavior for batch operations like putMany and deleteMany.
+    |
+    */
+    'batch' => [
+        'chunk_size' => env('STORAGE_DATABASE_BATCH_CHUNK_SIZE', 100),
+        'transaction_enabled' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Directory Cache Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure caching behavior for directory listings to improve
+    | performance when working with large directory structures.
+    |
+    */
+    'directory_cache' => [
+        'enabled' => env('STORAGE_DATABASE_DIRECTORY_CACHE_ENABLED', true),
+        'ttl' => env('STORAGE_DATABASE_DIRECTORY_CACHE_TTL', 3600),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Performance Monitoring
+    |--------------------------------------------------------------------------
+    |
+    | Configure performance monitoring settings. These help track and
+    | optimize storage operations.
+    |
+    */
+    'monitoring' => [
+        'track_size' => true,
+        'track_mime_type' => true,
+        'track_checksum' => true,
+        'stats_retention_days' => 30,
     ],
 ];

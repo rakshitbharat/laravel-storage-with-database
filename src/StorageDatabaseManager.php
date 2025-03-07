@@ -2,6 +2,7 @@
 
 namespace Rakshitbharat\LaravelStorageWithDatabase;
 
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Manager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +11,46 @@ use RuntimeException;
 
 class StorageDatabaseManager extends Manager
 {
-    protected function getDefaultDriver()
+    protected Container $app;
+    protected DatabaseDriver $driver;
+
+    public function __construct(Container $app)
+    {
+        $this->app = $app;
+        $this->driver = $app['filesystem']->disk('database')->getDriver();
+    }
+
+    public function __call($method, $parameters)
+    {
+        return $this->driver->{$method}(...$parameters);
+    }
+
+    public function getDriver(): DatabaseDriver
+    {
+        return $this->driver;
+    }
+
+    public function getMonitoringStats(?string $operation = null): array
+    {
+        $monitor = $this->driver->getMonitor();
+        if (!$monitor) {
+            throw StorageDatabaseException::monitoringNotEnabled();
+        }
+        
+        return $monitor->getStats($operation);
+    }
+
+    public function resetMonitoring(): void
+    {
+        $monitor = $this->driver->getMonitor();
+        if (!$monitor) {
+            throw StorageDatabaseException::monitoringNotEnabled();
+        }
+        
+        $monitor->reset();
+    }
+
+    public function getDefaultDriver()
     {
         return $this->config->get('storage-database.default');
     }
@@ -174,7 +214,7 @@ class StorageDatabaseManager extends Manager
 
     public function getVisibility($key)
     {
-        return $this->driver()->getVisibility($key);
+        return 'private';
     }
 
     public function put($key, $value, $options = [])
@@ -225,11 +265,6 @@ class StorageDatabaseManager extends Manager
     public function temporaryUrl($key, $expiration, $options = [])
     {
         return $this->driver()->temporaryUrl($key, $expiration, $options);
-    }
-
-    public function getVisibility($key)
-    {
-        return $this->driver()->getVisibility($key);
     }
 
     public function setVisibility($key, $visibility)

@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('{{ table }}', function (Blueprint $table) {
+        Schema::create('storage', function (Blueprint $table) {
             $table->id();
-            $table->string('path', 255)->unique();
-            $table->text('value');
+            $table->string('path')->unique();
+            $table->longText('value');
             $table->string('mime_type')->nullable();
-            $table->unsignedBigInteger('size')->default(0);
-            $table->string('checksum')->nullable();
+            $table->unsignedBigInteger('size');
+            $table->string('checksum', 32)->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
-            $table->softDeletes();
 
-            // Indexes for better performance
+            // Indexes for performance
             $table->index('path');
             $table->index('mime_type');
-            $table->index(['deleted_at', 'path']);
+            $table->index('created_at');
+            $table->index('updated_at');
         });
     }
 
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('{{ table }}');
+        Schema::dropIfExists('storage');
     }
 };
