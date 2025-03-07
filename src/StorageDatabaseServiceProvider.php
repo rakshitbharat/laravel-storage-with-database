@@ -7,7 +7,10 @@ use Illuminate\Filesystem\FilesystemManager;
 
 class StorageDatabaseServiceProvider extends ServiceProvider
 {
-    public function register()
+    /**
+     * Register any application services.
+     */
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/config/storage-database.php', 'storage-database');
 
@@ -15,61 +18,69 @@ class StorageDatabaseServiceProvider extends ServiceProvider
             return new StorageDatabaseManager($app);
         });
 
-        $this->app->afterResolving(FilesystemManager::class, function ($manager, $app) {
-            $manager->extend('database', function ($config, $app) {
-                return new DatabaseDriver(config('storage-database'));
-            });
-
-            return $manager;
+        $this->app->afterResolving(FilesystemManager::class, function ($manager) {
+            $this->extendFilesystemManager($manager);
         });
     }
 
-    public function boot()
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
     {
+        $this->registerPublishing();
+        $this->registerMigrations();
+    }
+
+    /**
+     * Register the package's publishable resources.
+     */
+    protected function registerPublishing(): void
+    {
+        if (!$this->app->runningInConsole()) {
+            return;
+        }
+
         $this->publishes([
             __DIR__ . '/config/storage-database.php' => config_path('storage-database.php'),
-        ], 'config');
+        ], ['storage-database', 'storage-database-config']);
 
-        if ($this->isPublishingMigrations()) {
-            $migrationPath = database_path('migrations/' . date('Y_m_d_His', time()) . '_create_storage_table.php');
-            $this->publishes([
-                $this->publishMigration($migrationPath) => $migrationPath,
-            ], 'migrations');
+        $this->publishes([
+            __DIR__ . '/database/migrations' => database_path('migrations'),
+        ], ['storage-database', 'storage-database-migrations']);
+    }
+
+    /**
+     * Register the package's migrations.
+     */
+    protected function registerMigrations(): void
+    {
+        if (!$this->app->runningInConsole()) {
+            return;
+        }
+
+        if ($this->shouldRunMigrations()) {
+            $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         }
     }
 
-    protected function isPublishingMigrations()
+    /**
+     * Extend the Filesystem manager with our custom driver.
+     */
+    protected function extendFilesystemManager(FilesystemManager $manager): void
     {
-        $publishingMigrations = false;
-        $args = $_SERVER['argv'];
-
-        foreach ($args as $arg) {
-            if (strpos($arg, '--tag=migrations') !== false) {
-                $publishingMigrations = true;
-                break;
-            }
-        }
-
-        return $publishingMigrations;
+        $manager->extend('database', function ($app, $config) {
+            $databaseConfig = $this->app['config']['storage-database'];
+            return new DatabaseDriver($databaseConfig);
+        });
     }
 
-    protected function publishMigration($migrationPath)
+    /**
+     * Determine if the migrations should be run.
+     */
+    protected function shouldRunMigrations(): bool
     {
-        $migrationContent = $this->getMigrationOutput();
-
-        file_put_contents($migrationPath, $migrationContent);
-
-        return $migrationPath;
-    }
-
-    protected function getMigrationOutput()
-    {
-        $stubPath = __DIR__ . '/database/migrations/create_storage_table.php.stub';
-        $migrationContent = file_get_contents($stubPath);
-
-        $tableName = $this->app['config']['storage-database.disks.database.table'];
-
-        $migrationContent = str_replace('{{ table }}', $tableName, $migrationContent);
-        return $migrationContent;
+        $config = $this->app['config']['storage-database'] ?? [];
+        return $config['run_migrations'] ?? false;
     }
 }

@@ -1,0 +1,15 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    tmpDir: build/phpstan
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#PHPDoc tag @var#'
+        - '#Call to an undefined method Illuminate\\Support\\Facades\\[A-Za-z]+::[a-zA-Z]+\(\)#'
+        - '#Access to an undefined property Illuminate\\Support\\Facades\\[A-Za-z]+::\$[a-zA-Z]+#'
+    excludePaths:
+        - 'vendor/*'
+        - 'build/*'
