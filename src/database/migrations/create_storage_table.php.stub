@@ -4,30 +4,36 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStorageTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('{{ table }}', function (Blueprint $table) {
+        Schema::create('storage', function (Blueprint $table) {
             $table->id();
             $table->string('path')->unique();
-            $table->text('value');
+            $table->longText('value');
+            $table->string('mime_type')->nullable();
+            $table->unsignedBigInteger('size');
+            $table->string('checksum', 32)->nullable();
+            $table->json('metadata')->nullable();
             $table->timestamps();
+
+            // Indexes for performance
+            $table->index('path');
+            $table->index('mime_type');
+            $table->index('created_at');
+            $table->index('updated_at');
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('{{ table }}');
+        Schema::dropIfExists('storage');
     }
-}
+};

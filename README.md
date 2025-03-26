@@ -99,6 +99,53 @@ Storage::disk('database')->delete('key');
 
 The package supports other Laravel Storage methods like `append`, `prepend`, `copy`, `move`, `size`, `lastModified`, and more. Refer to the Laravel filesystem documentation for a complete list of available methods[1].
 
+## Testing
+
+To run the test suite:
+
+```bash
+composer test
+```
+
+### Test Coverage
+The package includes both unit and feature tests:
+- Unit tests for core functionality
+- Feature tests for database operations
+- Mock tests for file system operations
+
+## Security
+
+- All data is stored using Laravel's database security features
+- Input validation for stored content
+- Protection against SQL injection via Laravel's query builder
+- No executable content is stored or processed
+
+## Development
+
+### Requirements
+- PHP 7.4 or higher
+- Laravel 8.0 or higher
+- PDO PHP Extension
+
+### Development Installation
+1. Clone the repo
+2. Run `composer install`
+3. Set up your test database
+4. Run `php artisan migrate`
+
+### Coding Standards
+This package follows PSR-12 coding standards. To check your code:
+
+```bash
+composer check-style
+```
+
+To automatically fix style issues:
+
+```bash
+composer fix-style
+```
+
 ## Contributing
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request on the [GitHub repository](https://github.com/rakshitbharat/laravel-storage-with-database).
