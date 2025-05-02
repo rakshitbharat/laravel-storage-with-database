@@ -40,6 +40,10 @@ class StorageDatabaseServiceProvider extends ServiceProvider
 
     protected function isPublishingMigrations()
     {
+        if (!isset($_SERVER['argv'])) {
+            return false;
+        }
+
         $publishingMigrations = false;
         $args = $_SERVER['argv'];
 
